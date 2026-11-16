@@ -340,14 +340,11 @@
         A cadeia automotiva ocupa posição central na indústria de transformação brasileira: mobiliza montadoras, autopeças,
         siderurgia, crédito e uma extensa rede de concessionárias. Por depender de bens duráveis de alto valor, comprados em
         geral a prazo, a produção de veículos reage rapidamente a mudanças em juros, renda, câmbio e política tributária.
-        Acompanhar essa série ajuda gestores públicos a calibrar políticas de estímulo, empresas da cadeia a planejar
-        estoques e turnos, e analistas a antecipar movimentos da atividade industrial.
+        Por isso a série é acompanhada de perto pelo governo, pelas empresas da cadeia e por quem analisa a atividade industrial.
       </p>
       <p>
-        Apesar de a série ser pública, ela costuma ser consumida em recortes curtos, comparando um mês com o anterior. Esse
-        olhar mistura três fenômenos distintos: a tendência de longo prazo, o padrão sazonal que se repete todo ano e os
-        choques pontuais. Um recuo em janeiro, por exemplo, pode ser apenas o efeito esperado das férias coletivas. Separar
-        esses componentes em um fluxo auditável é o objetivo prático deste trabalho.
+        Apesar de a série ser pública, ela costuma ser consumida em recortes curtos, comparando um mês com o anterior. O problema é que essa comparação mistura três coisas: a tendência de longo prazo, o padrão sazonal que se repete todo ano e os
+        choques pontuais. Um recuo em janeiro, por exemplo, pode ser apenas o efeito esperado das férias coletivas. Neste trabalho tentamos separar esses componentes com um pipeline que qualquer pessoa consiga rodar de novo.
       </p>
       <p>O estudo responde a três perguntas de pesquisa:</p>
       <ol class="rq">
@@ -370,7 +367,7 @@
         linhas, de janeiro de 1993 a novembro de 2022, sem desagregação por montadora, segmento ou estado.
       </p>
       <p>
-        Uma ressalva de nomenclatura: o título do dataset no Kaggle fala em "valor da produção", mas a coluna
+        Um detalhe que quase passou despercebido: o título do dataset no Kaggle fala em "valor da produção", mas a coluna
         <code>valor</code> registra quantidade física (unidades produzidas), e não valor monetário. Por isso a variável foi
         renomeada para <code>producao</code> no dado tratado, e o dicionário de dados documenta a unidade.
       </p>
@@ -474,8 +471,8 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
       </ul>
 
       <p>
-        Em síntese, o pico de 2013 representa 3,17 vezes o volume de 1993, ou 5,9% de crescimento médio anual em vinte anos.
-        O dado mais relevante para a RQ1, porém, é que esse pico não foi recuperado: em novembro de 2022 o acumulado em 12
+        O pico de 2013 representa 3,17 vezes o volume de 1993, ou 5,9% de crescimento médio anual em vinte anos.
+        O que mais chama atenção, porém, é que esse pico não foi recuperado: em novembro de 2022 o acumulado em 12
         meses era de 2,39 milhões de unidades, 36,7% abaixo do máximo de 3,77 milhões registrado em setembro de 2013. A
         indústria encerra a série produzindo em patamar semelhante ao de 2005 e 2006.
       </p>
@@ -495,7 +492,7 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
         variância da razão entre produção e tendência.
       </p>
       <p>
-        Esse desenho é coerente com o funcionamento do setor. As férias coletivas concentram-se entre a segunda quinzena de
+        Isso bate com o funcionamento do setor. As férias coletivas concentram-se entre a segunda quinzena de
         dezembro e o início de janeiro, e fevereiro tem menos dias úteis e, em geral, o Carnaval. Março e agosto, por sua
         vez, são meses longos e sem grandes feriados, que sucedem períodos de produção reduzida.
       </p>
@@ -506,7 +503,7 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
       </figure>
 
       <p>
-        A Figura 4 acrescenta a dispersão: além do nível, os meses diferem em regularidade. Julho e maio têm caixas
+        A Figura 4 mostra também a dispersão: alguns meses são bem mais regulares que outros. Julho e maio têm caixas
         estreitas, enquanto junho, outubro e dezembro variam mais de um ano para outro. Para avaliar a estabilidade do
         padrão, recalculamos o índice em três subperíodos (Tabela 1).
       </p>
@@ -560,7 +557,7 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
       </div>
 
       <p>
-        Um ponto importante é que a pandemia não aparece como ciclo separado: ela atingiu a indústria quando esta ainda
+        Repare que a pandemia não aparece como ciclo separado na tabela: ela atingiu a indústria quando esta ainda
         estava 22% abaixo do pico de 2013 e aprofundou uma retração já existente. Para comparar os dois choques abruptos da
         série, medimos a queda da produção dessazonalizada frente à média dos três meses anteriores (Tabela 3).
       </p>
@@ -580,7 +577,7 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
         choque só foi retomado em outubro de 2009. O período coincide com a redução do IPI para automóveis, adotada a partir
         de dezembro de 2008. Em abril de 2020, com as fábricas paradas, a produção foi de apenas 1.847 unidades (queda de
         99,3% em 12 meses), o menor valor de toda a série. A retomada, porém, foi mais rápida: o nível dessazonalizado
-        anterior voltou em setembro de 2020. O choque da pandemia foi, portanto, mais profundo e mais curto. A fraqueza de
+        anterior voltou em setembro de 2020. Ou seja, o choque da pandemia foi mais profundo, mas durou menos. A fraqueza de
         2021, visível na Figura 1, tem outra natureza: o setor relatou restrições de oferta, em especial a escassez de
         semicondutores.
       </p>
@@ -604,7 +601,7 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
     <section id="conclusao">
       <h2>4. Conclusão</h2>
       <p>
-        O estudo responde às três perguntas propostas. Quanto à <strong>RQ1</strong>, a produção de veículos seguiu ciclos
+        Voltando às três perguntas de pesquisa. Quanto à <strong>RQ1</strong>, a produção de veículos seguiu ciclos
         longos: mais que triplicou entre 1993 e 2013, mas perdeu 41,4% entre 2013 e 2016 e terminou 2022 ainda 36,7% abaixo
         do pico. Quanto à <strong>RQ2</strong>, existe sazonalidade significativa e relativamente estável, com vale entre
         dezembro e fevereiro e picos em março e agosto, embora o vale de fim de ano tenha se atenuado. Quanto à
@@ -619,10 +616,7 @@ df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; supe
         fim, o recorte termina em novembro de 2022.
       </p>
       <p>
-        <strong>Trabalhos futuros.</strong> (i) Atualizar a série pela API do SGS, já suportada pelo pipeline; (ii) cruzar a
-        produção com juros (Selic), crédito, câmbio e licenciamentos para investigar determinantes; (iii) aplicar
-        decomposição STL e ajuste por dias úteis; (iv) construir modelos de previsão (SARIMA, ETS) e avaliá-los fora da
-        amostra; e (v) desagregar por segmento com os anuários da ANFAVEA.
+        <strong>Trabalhos futuros.</strong> O primeiro passo seria atualizar a série pela API do SGS, o que o pipeline já permite. Depois, cruzar a produção com juros (Selic), crédito e câmbio para entender o que puxa os ciclos, e testar modelos de previsão como o SARIMA. Também seria interessante separar a análise por segmento, usando os anuários da ANFAVEA.
       </p>
     </section>
 

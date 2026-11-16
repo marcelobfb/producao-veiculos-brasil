@@ -101,7 +101,7 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/analise_explorator
 python -m http.server --directory docs 8000    # http://localhost:8000
 ```
 
-O pipeline é determinístico: duas execuções seguidas geram arquivos idênticos em `data/processed/` e `docs/assets/`.
+Rodando duas vezes seguidas, os arquivos de `data/processed/` e `docs/assets/` saem idênticos.
 
 ## Pipeline em resumo
 
@@ -112,7 +112,7 @@ O pipeline é determinístico: duas execuções seguidas geram arquivos idêntic
 | **Load** | Grava Parquet, CSV gzip e relatório de qualidade | `etl.load` |
 | **Análise** | Totais anuais, índice sazonal por período, ciclos de queda, choques, outliers; figuras e dados para Plotly | `analise.main` |
 
-Nenhuma operação é destrutiva: o bruto não é alterado, linhas descartadas são contadas no relatório de qualidade e outliers são apenas sinalizados.
+O arquivo bruto nunca é alterado. Linhas descartadas são contadas no relatório de qualidade e os outliers ficam só marcados, sem remoção.
 
 ## Aderência aos princípios FAIR
 
