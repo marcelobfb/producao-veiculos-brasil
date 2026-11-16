@@ -1,0 +1,17 @@
+{
+  "arquivo_bruto": "bcdata.sgs.1373.csv",
+  "codificacao": "utf-8-sig",
+  "separador": ";",
+  "linhas_brutas": 359,
+  "datas_invalidas": 0,
+  "valores_invalidos": 0,
+  "valores_negativos": 0,
+  "duplicatas_removidas": 0,
+  "meses_ausentes": 0,
+  "linhas_finais": 359,
+  "periodo": [
+    "1993-01",
+    "2022-11"
+  ],
+  "outliers_sinalizados": 16
+}
