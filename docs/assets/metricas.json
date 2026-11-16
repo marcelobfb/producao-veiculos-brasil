@@ -1,0 +1,274 @@
+{
+  "periodo": [
+    "1993-01",
+    "2022-11"
+  ],
+  "n_meses": 359,
+  "total_periodo": 69273186,
+  "descritivas": {
+    "media": 192962.0,
+    "mediana": 190099.0,
+    "desvio_padrao": 67440.0,
+    "cv_pct": 35.0,
+    "q1": 136171.0,
+    "q3": 243578.0,
+    "minimo": {
+      "data": "2020-04",
+      "valor": 1847
+    },
+    "maximo": {
+      "data": "2013-04",
+      "valor": 352328
+    }
+  },
+  "anual": {
+    "primeiro_ano": {
+      "ano": 1993,
+      "total": 1173300
+    },
+    "ano_pico": {
+      "ano": 2013,
+      "total": 3713813
+    },
+    "multiplo_pico_sobre_1993": 3.17,
+    "cagr_1993_pico_pct": 5.93,
+    "cagr_2003_2013_pct": 8.23,
+    "var_2013_2016_pct": -41.4,
+    "var_2019_2020_pct": -31.6,
+    "var_2021_sobre_2019_pct": -23.7,
+    "total_2021": 2248253
+  },
+  "acumulado_12m": {
+    "pico": {
+      "data": "2013-09",
+      "valor": 3774045
+    },
+    "ultimo": {
+      "data": "2022-11",
+      "valor": 2389127,
+      "queda_do_pico_pct": -36.7
+    }
+  },
+  "sazonalidade": {
+    "indice": {
+      "Jan": 84.23,
+      "Fev": 90.14,
+      "Mar": 108.56,
+      "Abr": 98.62,
+      "Mai": 105.88,
+      "Jun": 101.59,
+      "Jul": 103.15,
+      "Ago": 111.33,
+      "Set": 100.82,
+      "Out": 105.94,
+      "Nov": 103.04,
+      "Dez": 86.7
+    },
+    "amplitude_pontos": 27.1,
+    "kruskal_h": 138.7,
+    "kruskal_p": 2.945577662534853e-24,
+    "eta2_pct": 30.7,
+    "por_periodo": {
+      "1993-2002": {
+        "Jan": 79.0,
+        "Fev": 90.1,
+        "Mar": 110.0,
+        "Abr": 104.4,
+        "Mai": 109.5,
+        "Jun": 108.8,
+        "Jul": 104.0,
+        "Ago": 114.6,
+        "Set": 102.5,
+        "Out": 101.3,
+        "Nov": 95.2,
+        "Dez": 80.8
+      },
+      "2003-2012": {
+        "Jan": 87.4,
+        "Fev": 90.2,
+        "Mar": 108.0,
+        "Abr": 96.9,
+        "Mai": 105.6,
+        "Jun": 102.1,
+        "Jul": 103.8,
+        "Ago": 108.6,
+        "Set": 98.8,
+        "Out": 105.4,
+        "Nov": 103.5,
+        "Dez": 89.8
+      },
+      "2013-2022": {
+        "Jan": 86.5,
+        "Fev": 91.6,
+        "Mar": 106.5,
+        "Abr": 99.0,
+        "Mai": 102.3,
+        "Jun": 93.8,
+        "Jul": 102.0,
+        "Ago": 110.4,
+        "Set": 101.8,
+        "Out": 108.9,
+        "Nov": 107.5,
+        "Dez": 89.6
+      },
+      "1993-2022": {
+        "Jan": 84.2,
+        "Fev": 90.1,
+        "Mar": 108.6,
+        "Abr": 98.6,
+        "Mai": 105.9,
+        "Jun": 101.6,
+        "Jul": 103.2,
+        "Ago": 111.3,
+        "Set": 100.8,
+        "Out": 105.9,
+        "Nov": 103.0,
+        "Dez": 86.7
+      }
+    }
+  },
+  "outliers": {
+    "total": 16,
+    "negativos": 10,
+    "limites_pct": [
+      -20.8,
+      19.8
+    ],
+    "lista": [
+      {
+        "data": "1995-01",
+        "producao": 78192,
+        "residuo_pct": -21.8
+      },
+      {
+        "data": "1995-06",
+        "producao": 153241,
+        "residuo_pct": 23.42
+      },
+      {
+        "data": "1998-11",
+        "producao": 79643,
+        "residuo_pct": -28.24
+      },
+      {
+        "data": "1998-12",
+        "producao": 59650,
+        "residuo_pct": -36.13
+      },
+      {
+        "data": "2001-05",
+        "producao": 181201,
+        "residuo_pct": 23.88
+      },
+      {
+        "data": "2003-08",
+        "producao": 130353,
+        "residuo_pct": -23.06
+      },
+      {
+        "data": "2008-11",
+        "producao": 187374,
+        "residuo_pct": -26.71
+      },
+      {
+        "data": "2008-12",
+        "producao": 91314,
+        "residuo_pct": -57.55
+      },
+      {
+        "data": "2014-09",
+        "producao": 300931,
+        "residuo_pct": 21.05
+      },
+      {
+        "data": "2020-04",
+        "producao": 1847,
+        "residuo_pct": -99.05
+      },
+      {
+        "data": "2020-05",
+        "producao": 43080,
+        "residuo_pct": -79.31
+      },
+      {
+        "data": "2020-06",
+        "producao": 98447,
+        "residuo_pct": -50.72
+      },
+      {
+        "data": "2020-07",
+        "producao": 170651,
+        "residuo_pct": -24.24
+      },
+      {
+        "data": "2020-12",
+        "producao": 209296,
+        "residuo_pct": 24.7
+      },
+      {
+        "data": "2021-01",
+        "producao": 200398,
+        "residuo_pct": 22.9
+      },
+      {
+        "data": "2021-12",
+        "producao": 210925,
+        "residuo_pct": 40.89
+      }
+    ]
+  },
+  "episodios": [
+    {
+      "pico": "1997-10",
+      "pico_valor": 1890462,
+      "vale": "1999-09",
+      "vale_valor": 1222254,
+      "queda_pct": -35.3,
+      "meses_ate_vale": 23,
+      "recuperacao": "2004-07",
+      "meses_ate_recuperar": 81.0
+    },
+    {
+      "pico": "2008-09",
+      "pico_valor": 3254922,
+      "vale": "2009-09",
+      "vale_valor": 2805469,
+      "queda_pct": -13.8,
+      "meses_ate_vale": 12,
+      "recuperacao": "2010-05",
+      "meses_ate_recuperar": 20.0
+    },
+    {
+      "pico": "2013-09",
+      "pico_valor": 3774045,
+      "vale": "2020-10",
+      "vale_valor": 1964518,
+      "queda_pct": -47.9,
+      "meses_ate_vale": 85,
+      "recuperacao": null,
+      "meses_ate_recuperar": null
+    }
+  ],
+  "choques": [
+    {
+      "choque": "Crise financeira global (2008)",
+      "referencia_dessaz": 283138,
+      "fundo": "2008-12",
+      "producao_no_fundo": 91314,
+      "queda_dessaz_pct": -62.8,
+      "var_anual_no_fundo_pct": -57.92,
+      "retomada": "2009-10",
+      "meses_abaixo_da_referencia": 12
+    },
+    {
+      "choque": "Pandemia de COVID-19 (2020)",
+      "referencia_dessaz": 216940,
+      "fundo": "2020-04",
+      "producao_no_fundo": 1847,
+      "queda_dessaz_pct": -99.1,
+      "var_anual_no_fundo_pct": -99.31,
+      "retomada": "2020-09",
+      "meses_abaixo_da_referencia": 6
+    }
+  ]
+}
