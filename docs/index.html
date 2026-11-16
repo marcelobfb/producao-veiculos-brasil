@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Artigo acadêmico: ciclos, sazonalidade e choques na produção mensal de veículos no Brasil (1993-2022), com pipeline reprodutível em Python sob princípios FAIR.">
+  <meta name="author" content="Marcelo Bernardes, Lucas Queiroz">
+  <meta name="keywords" content="indústria automotiva, séries temporais, sazonalidade, análise exploratória de dados, Python, princípios FAIR">
+  <title>Ciclos, Sazonalidade e Choques na Produção de Veículos no Brasil (1993-2022)</title>
+
+  <!-- Plotly.js para gráficos interativos incorporados -->
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <!-- Séries e métricas geradas por src/analise.py -->
+  <script src="assets/dados_graficos.js"></script>
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --text: #1f2937;
+      --text-muted: #4b5563;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+      --font-serif: "Merriweather", Georgia, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text);
+      background-color: var(--bg);
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      padding: 3.5rem 4rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    /* Cabeçalho Acadêmico */
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    h1.paper-title {
+      font-family: var(--font-sans);
+      font-size: 2.1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+    }
+
+    .meta-block {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .authors { font-weight: 600; color: var(--text); }
+    .affiliations { font-style: italic; }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+
+    .badge {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    .repo-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.4rem 0.8rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--primary);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .repo-badge:hover { background: #e2e8f0; }
+
+    /* Abstract / Resumo */
+    .abstract-box {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      border-left: 4px solid var(--primary-light);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .abstract-box h3 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .abstract-box p { font-size: 0.95rem; line-height: 1.6; }
+    .keywords { margin-top: 0.8rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Navegação / Sumário */
+    nav.toc {
+      font-family: var(--font-sans);
+      background: #fdfefe;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.2rem 1.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    nav.toc h4 { font-size: 1rem; color: var(--primary); margin-bottom: 0.6rem; }
+    nav.toc ol { padding-left: 1.2rem; }
+    nav.toc li { margin: 0.3rem 0; }
+    nav.toc a { color: var(--text-muted); text-decoration: none; font-size: 0.92rem; }
+    nav.toc a:hover { color: var(--primary-light); text-decoration: underline; }
+
+    /* Seções e Tipografia */
+    section { margin-bottom: 2.5rem; }
+
+    h2 {
+      font-family: var(--font-sans);
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+    }
+
+    h3.sub {
+      font-family: var(--font-sans);
+      font-size: 1.12rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 1.8rem 0 0.8rem;
+    }
+
+    p { margin-bottom: 1.2rem; text-align: justify; }
+
+    section ul, section ol.rq { margin: 0 0 1.2rem 1.4rem; }
+    section li { margin-bottom: 0.5rem; }
+
+    /* Figuras, Visualizações e Códigos */
+    figure { margin: 2rem 0; text-align: center; }
+
+    .chart-container {
+      width: 100%;
+      overflow: hidden;
+      min-height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    figure img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    figcaption {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.6rem;
+      text-align: center;
+    }
+
+    pre, code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.9rem;
+      background-color: var(--code-bg);
+    }
+
+    code { padding: 0.2rem 0.4rem; border-radius: 3px; }
+
+    pre {
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 1.2rem;
+      border: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    pre code { padding: 0; }
+
+    /* Tabelas */
+    .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    caption {
+      caption-side: top;
+      text-align: left;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    th, td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { color: var(--primary); border-bottom: 2px solid var(--border); font-weight: 600; }
+
+    /* Callouts e FAIR box */
+    .fair-box {
+      font-family: var(--font-sans);
+      border: 1px solid #bfdbfe;
+      background-color: #eff6ff;
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .fair-box h3 { font-size: 1rem; color: #1e40af; margin-bottom: 0.5rem; }
+    .fair-box ul { margin-left: 1.2rem; font-size: 0.92rem; color: #1e3a8a; }
+
+    /* Referências */
+    .references ol { padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-muted); }
+    .references li { margin-bottom: 0.6rem; overflow-wrap: anywhere; }
+
+    footer {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 0.75rem 0.5rem; }
+      .container { padding: 1.5rem; }
+      h1.paper-title { font-size: 1.6rem; }
+      p { text-align: left; }
+      .chart-container { min-height: 360px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1 class="paper-title">Ciclos, Sazonalidade e Choques na Produção de Veículos no Brasil (1993-2022): uma Análise Exploratória Reprodutível em Python</h1>
+
+      <div class="meta-block authors">
+        Marcelo Bernardes, Lucas Queiroz
+      </div>
+
+      <div class="meta-block affiliations">
+        Bacharelado em Sistemas de Informação, UniLaSalle Rio de Janeiro<br>
+        Disciplina: Linguagens de Programação (Análise e Visualização de Dados com Python), 6º Período, 2026.2
+      </div>
+
+      <div class="badges" aria-label="Metadados do projeto">
+        <span class="badge">Python 3.13</span>
+        <span class="badge">pandas 3.0</span>
+        <span class="badge">Plotly.js 2.27</span>
+        <span class="badge">Código: MIT</span>
+        <span class="badge">Texto e dados: CC-BY 4.0</span>
+        <span class="badge">FAIR</span>
+      </div>
+
+      <a href="https://github.com/marcelobfb/producao-veiculos-brasil" class="repo-badge" target="_blank" rel="noopener noreferrer">
+        📦 Ver Repositório GitHub (Código e Dados)
+      </a>
+    </header>
+
+    <div class="abstract-box">
+      <h3>Resumo</h3>
+      <p>
+        A indústria automotiva é um dos setores mais sensíveis ao ciclo econômico brasileiro, e sua produção mensal funciona
+        como termômetro da atividade industrial. Este artigo analisa a série de produção de veículos automotores divulgada
+        pela ANFAVEA e distribuída pelo Banco Central do Brasil (SGS 1373), com 359 observações mensais entre janeiro de 1993
+        e novembro de 2022. Construímos um pipeline determinístico em Python (pandas) que lê o arquivo bruto, valida tipos e
+        continuidade do calendário, deriva métricas de tendência, sazonalidade e resíduo, e persiste o resultado em Parquet.
+        A análise exploratória mostra três achados. Primeiro, a produção anual mais que triplicou entre 1993 e o pico de 2013
+        (de 1,17 para 3,71 milhões de unidades), recuou 41,4% até 2016 e não retornou ao pico até o fim da série. Segundo, há
+        sazonalidade estatisticamente significativa: janeiro, fevereiro e dezembro ficam de 10% a 16% abaixo da tendência,
+        enquanto agosto e março ficam cerca de 10% acima. Terceiro, os choques diferem em forma: a pandemia de 2020 foi o mais
+        profundo e o mais curto, e a retração iniciada em 2013 é a mais longa. Todo o código, os dados e este texto estão
+        disponíveis em repositório público, em conformidade com os princípios FAIR.
+      </p>
+      <div class="keywords">
+        <strong>Palavras-chave:</strong> Indústria Automotiva, Séries Temporais, Sazonalidade, Análise Exploratória de Dados, Python, Princípios FAIR.
+      </div>
+    </div>
+
+    <nav class="toc">
+      <h4>Sumário</h4>
+      <ol>
+        <li><a href="#intro">Introdução</a></li>
+        <li><a href="#metodologia">Metodologia e Pipeline de Dados</a></li>
+        <li><a href="#resultados">Resultados e Discussão</a></li>
+        <li><a href="#conclusao">Conclusão</a></li>
+        <li><a href="#fair">Disponibilidade dos Dados e Declaração FAIR</a></li>
+        <li><a href="#referencias">Referências</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. Introdução -->
+    <section id="intro">
+      <h2>1. Introdução</h2>
+      <p>
+        A cadeia automotiva ocupa posição central na indústria de transformação brasileira: mobiliza montadoras, autopeças,
+        siderurgia, crédito e uma extensa rede de concessionárias. Por depender de bens duráveis de alto valor, comprados em
+        geral a prazo, a produção de veículos reage rapidamente a mudanças em juros, renda, câmbio e política tributária.
+        Acompanhar essa série ajuda gestores públicos a calibrar políticas de estímulo, empresas da cadeia a planejar
+        estoques e turnos, e analistas a antecipar movimentos da atividade industrial.
+      </p>
+      <p>
+        Apesar de a série ser pública, ela costuma ser consumida em recortes curtos, comparando um mês com o anterior. Esse
+        olhar mistura três fenômenos distintos: a tendência de longo prazo, o padrão sazonal que se repete todo ano e os
+        choques pontuais. Um recuo em janeiro, por exemplo, pode ser apenas o efeito esperado das férias coletivas. Separar
+        esses componentes em um fluxo auditável é o objetivo prático deste trabalho.
+      </p>
+      <p>O estudo responde a três perguntas de pesquisa:</p>
+      <ol class="rq">
+        <li><strong>RQ1.</strong> Como a produção de veículos evoluiu entre 1993 e 2022, e quais ciclos de expansão e retração podem ser identificados?</li>
+        <li><strong>RQ2.</strong> Existe um padrão sazonal sistemático na produção mensal? Ele se manteve estável ao longo das três décadas?</li>
+        <li><strong>RQ3.</strong> Qual foi a profundidade e a duração dos grandes choques (1998-1999, 2008-2009, 2014-2016 e 2020), e quais meses se comportam como outliers?</li>
+      </ol>
+    </section>
+
+    <!-- 2. Metodologia -->
+    <section id="metodologia">
+      <h2>2. Metodologia e Pipeline de Dados</h2>
+
+      <h3 class="sub">2.1 Fonte e granularidade</h3>
+      <p>
+        O conjunto de dados é o arquivo <code>bcdata.sgs.1373.csv</code>, publicado no Kaggle por Bernardo (2022). Ele
+        reproduz a série 1373 do Sistema Gerenciador de Séries Temporais (SGS) do Banco Central do Brasil, cuja fonte
+        primária é a Associação Nacional dos Fabricantes de Veículos Automotores (ANFAVEA). A granularidade é mensal e
+        nacional: cada linha traz uma data (primeiro dia do mês) e o total de veículos produzidos naquele mês. São 359
+        linhas, de janeiro de 1993 a novembro de 2022, sem desagregação por montadora, segmento ou estado.
+      </p>
+      <p>
+        Uma ressalva de nomenclatura: o título do dataset no Kaggle fala em "valor da produção", mas a coluna
+        <code>valor</code> registra quantidade física (unidades produzidas), e não valor monetário. Por isso a variável foi
+        renomeada para <code>producao</code> no dado tratado, e o dicionário de dados documenta a unidade.
+      </p>
+
+      <h3 class="sub">2.2 Estratégias de tratamento</h3>
+      <ul>
+        <li><strong>Codificação e separador.</strong> O arquivo usa ponto e vírgula como separador, todos os campos entre aspas e quebras de linha no padrão Windows. O pipeline testa as codificações <code>utf-8-sig</code> e <code>latin-1</code> e detecta o separador com <code>csv.Sniffer</code>, em vez de fixá-los no código.</li>
+        <li><strong>Tipos primitivos.</strong> Tudo é lido como texto. A data é convertida com formato explícito <code>%d/%m/%Y</code> (evitando a inversão dia/mês do padrão americano) e a produção vira inteiro anulável (<code>Int64</code>), após remoção de eventual separador de milhar.</li>
+        <li><strong>Valores ausentes e inconsistências.</strong> Datas inválidas, valores não numéricos, negativos e duplicatas são contados e gravados em <code>relatorio_qualidade.json</code>. A série é reindexada em um calendário mensal completo, de modo que um mês faltante apareceria como linha nula, sem ser inventado. Nesta base, todos os contadores resultaram em zero, e nenhuma imputação ou descarte foi necessário.</li>
+        <li><strong>Rastreabilidade.</strong> O arquivo bruto nunca é sobrescrito. Outliers são sinalizados em uma coluna booleana, e não removidos.</li>
+      </ul>
+
+      <pre><code># src/etl.py (trecho): leitura como texto e tipagem explícita
+bruto = pd.read_csv(caminho, sep=separador, encoding=codificacao,
+                    dtype=str, quotechar='"')
+
+df = pd.DataFrame({
+    "data": pd.to_datetime(bruto["data"].str.strip(),
+                           format="%d/%m/%Y", errors="coerce"),
+    "producao": _para_inteiro(bruto["valor"]),   # Int64 anulável
+})
+
+# Calendário completo: mês ausente vira linha nula, visível na análise
+calendario = pd.date_range(df["data"].min(), df["data"].max(), freq="MS")
+df = df.set_index("data").reindex(calendario).rename_axis("data").reset_index()</code></pre>
+
+      <h3 class="sub">2.3 Métricas derivadas</h3>
+      <p>
+        Para separar tendência, sazonalidade e choques, adotamos a decomposição clássica multiplicativa (Hyndman;
+        Athanasopoulos, 2021). A tendência é estimada por média móvel centrada 2x12. A razão entre a produção e a tendência
+        isola o componente sazonal somado ao irregular. O índice sazonal de cada mês é a mediana dessa razão, normalizada
+        para média 100. Optamos pela mediana porque a média seria distorcida por abril de 2020, quando a produção quase
+        zerou.
+      </p>
+      <p>
+        O resíduo é o desvio percentual da produção dessazonalizada frente a uma mediana móvel centrada de 13 meses. Os
+        outliers seguem a regra de Tukey (1977): pontos além de 1,5 vez o intervalo interquartil do resíduo. Para medir
+        ciclos, usamos o acumulado em 12 meses, que elimina a sazonalidade por construção, e a sua distância percentual em
+        relação ao pico histórico anterior.
+      </p>
+
+      <pre><code># src/etl.py (trecho): sazonalidade robusta e sinalização de outliers
+df["tendencia"] = media_movel_centrada_12m(producao)          # MM 2x12
+df["razao_tendencia"] = producao / df["tendencia"]
+
+sazonal = df.groupby("mes")["razao_tendencia"].median()
+sazonal = sazonal / sazonal.mean() * 100
+df["indice_sazonal"] = df["mes"].map(sazonal)
+
+df["producao_dessaz"] = producao / (df["indice_sazonal"] / 100)
+df["tendencia_robusta"] = df["producao_dessaz"].rolling(13, center=True).median()
+df["residuo_pct"] = (df["producao_dessaz"] / df["tendencia_robusta"] - 1) * 100
+
+q1, q3 = df["residuo_pct"].quantile([0.25, 0.75])
+iqr = q3 - q1
+inferior, superior = q1 - LIMITE_IQR * iqr, q3 + LIMITE_IQR * iqr
+df["outlier"] = (df["residuo_pct"] &lt; inferior) | (df["residuo_pct"] &gt; superior)</code></pre>
+
+      <p>
+        O dado tratado, com 17 variáveis, é persistido em <code>Apache Parquet</code> (preserva a tipagem colunar) e em
+        <code>CSV</code> comprimido com gzip (leitura universal). As métricas agregadas e as figuras são geradas por
+        <code>src/analise.py</code>, e os gráficos interativos desta página leem diretamente o arquivo exportado por esse
+        módulo, de modo que texto e visualizações partem da mesma fonte.
+      </p>
+    </section>
+
+    <!-- 3. Resultados -->
+    <section id="resultados">
+      <h2>3. Resultados e Discussão</h2>
+
+      <p>
+        Nos 359 meses analisados foram produzidos 69,3 milhões de veículos. A produção mensal tem média de 192.962 unidades,
+        mediana de 190.099 e desvio padrão de 67.440, o que resulta em coeficiente de variação de 35,0%. O intervalo vai de
+        1.847 unidades (abril de 2020) a 352.328 (abril de 2013). Essa dispersão elevada reflete sobretudo a mudança de
+        patamar ao longo de três décadas, discutida a seguir.
+      </p>
+
+      <h3 class="sub">3.1 RQ1: tendência de longo prazo e ciclos</h3>
+
+      <figure>
+        <div id="fig-serie" class="chart-container"></div>
+        <figcaption>Figura 1: Produção mensal de veículos e média móvel de 12 meses, jan/1993 a nov/2022. Gráfico interativo: passe o cursor para ver os valores e arraste para ampliar um período.</figcaption>
+      </figure>
+
+      <p>
+        A Figura 1 mostra que a série não cresce de forma linear: ela alterna fases longas de expansão e retração. A leitura
+        anual (Figura 2) permite delimitar cinco fases.
+      </p>
+
+      <figure>
+        <div id="fig-anual" class="chart-container"></div>
+        <figcaption>Figura 2: Produção anual de veículos. A barra de 2022 está em tom mais claro por cobrir apenas janeiro a novembro.</figcaption>
+      </figure>
+
+      <ul>
+        <li><strong>1993 a 1997, expansão pós-estabilização.</strong> A produção anual sobe de 1,17 para 1,86 milhão de unidades, período que coincide com a estabilização monetária do Plano Real e a recomposição do crédito ao consumidor.</li>
+        <li><strong>1998 a 2003, retração e estagnação.</strong> Em meio às crises asiática e russa e à desvalorização cambial de 1999, a produção cai para 1,29 milhão em 1999 e permanece próxima de 1,6 a 1,7 milhão até 2003.</li>
+        <li><strong>2004 a 2013, grande expansão.</strong> A produção passa de 1,68 milhão (2003) para o recorde de 3,71 milhões (2013), crescimento médio de 8,2% ao ano. O ciclo é interrompido apenas brevemente no fim de 2008.</li>
+        <li><strong>2014 a 2016, recessão.</strong> Em três anos a produção recua 41,4%, para 2,18 milhões, voltando a um nível próximo ao de 2004.</li>
+        <li><strong>2017 a 2022, recuperação parcial e pandemia.</strong> A retomada leva a produção a 2,94 milhões em 2019. Em 2020 ela cai 31,6%, e 2021 ainda fica 23,7% abaixo de 2019.</li>
+      </ul>
+
+      <p>
+        Em síntese, o pico de 2013 representa 3,17 vezes o volume de 1993, ou 5,9% de crescimento médio anual em vinte anos.
+        O dado mais relevante para a RQ1, porém, é que esse pico não foi recuperado: em novembro de 2022 o acumulado em 12
+        meses era de 2,39 milhões de unidades, 36,7% abaixo do máximo de 3,77 milhões registrado em setembro de 2013. A
+        indústria encerra a série produzindo em patamar semelhante ao de 2005 e 2006.
+      </p>
+
+      <h3 class="sub">3.2 RQ2: sazonalidade</h3>
+
+      <figure>
+        <div id="fig-sazonal" class="chart-container"></div>
+        <figcaption>Figura 3: Índice sazonal por mês (100 = tendência). Barras acima de 100 indicam meses tipicamente mais fortes; abaixo, meses mais fracos.</figcaption>
+      </figure>
+
+      <p>
+        Há um padrão sazonal claro (Figura 3). Janeiro (84,2), dezembro (86,7) e fevereiro (90,1) ficam entre 10% e 16%
+        abaixo da tendência. Os meses mais fortes são agosto (111,3) e março (108,6), seguidos por outubro e maio (105,9
+        cada). A amplitude entre o mês mais forte e o mais fraco é de 27,1 pontos. O teste de Kruskal-Wallis rejeita a
+        hipótese de que os doze meses tenham a mesma distribuição (H = 138,7; p &lt; 0,001), e o mês do ano explica 30,7% da
+        variância da razão entre produção e tendência.
+      </p>
+      <p>
+        Esse desenho é coerente com o funcionamento do setor. As férias coletivas concentram-se entre a segunda quinzena de
+        dezembro e o início de janeiro, e fevereiro tem menos dias úteis e, em geral, o Carnaval. Março e agosto, por sua
+        vez, são meses longos e sem grandes feriados, que sucedem períodos de produção reduzida.
+      </p>
+
+      <figure>
+        <img src="assets/fig3_boxplot_sazonal.png" alt="Boxplots da razão entre produção e tendência para cada mês do ano. Janeiro, fevereiro e dezembro têm medianas abaixo de 100; março e agosto, as mais altas. Há pontos extremos em abril, maio e junho (2020) e em dezembro (1998 e 2008)." loading="lazy">
+        <figcaption>Figura 4: Distribuição da razão produção/tendência por mês (figura estática gerada com matplotlib). Os pontos vermelhos são valores extremos; os mais baixos correspondem a abril, maio e junho de 2020 e a dezembro de 1998 e de 2008.</figcaption>
+      </figure>
+
+      <p>
+        A Figura 4 acrescenta a dispersão: além do nível, os meses diferem em regularidade. Julho e maio têm caixas
+        estreitas, enquanto junho, outubro e dezembro variam mais de um ano para outro. Para avaliar a estabilidade do
+        padrão, recalculamos o índice em três subperíodos (Tabela 1).
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Tabela 1: Índice sazonal por subperíodo (100 = tendência).</caption>
+          <thead>
+            <tr><th>Período</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th><th>Out</th><th>Nov</th><th>Dez</th></tr>
+          </thead>
+          <tbody id="tab-sazonal"></tbody>
+        </table>
+      </div>
+
+      <p>
+        O formato geral se mantém (vale em dezembro, janeiro e fevereiro; picos em março e agosto), mas há três mudanças
+        graduais. O vale de virada de ano ficou mais raso: janeiro passou de 79,0 para 86,5 e dezembro de 80,8 para 89,6.
+        Novembro deixou de ser um mês fraco (95,2) e tornou-se forte (107,5). Junho fez o caminho inverso, de 108,8 para
+        93,8. O último número deve ser lido com cautela, pois o subperíodo de 2013 a 2022 inclui anos atípicos, como 2014
+        (Copa do Mundo no Brasil, em junho e julho) e 2020 (junho ainda sob efeito das paralisações da pandemia).
+      </p>
+
+      <figure>
+        <img src="assets/fig4_heatmap_ano_mes.png" alt="Mapa de calor com anos nas linhas e meses nas colunas. Os tons mais escuros concentram-se entre 2010 e 2013; as colunas de janeiro, fevereiro e dezembro são sistematicamente mais claras; abril a junho de 2020 e dezembro de 2008 aparecem quase brancos." loading="lazy">
+        <figcaption>Figura 5: Produção por ano e mês, em mil unidades (figura estática). A leitura vertical mostra o ciclo de longo prazo; a horizontal, a sazonalidade. Dezembro de 2022 está em branco por não fazer parte da base.</figcaption>
+      </figure>
+
+      <h3 class="sub">3.3 RQ3: choques, duração e outliers</h3>
+
+      <figure>
+        <div id="fig-queda" class="chart-container"></div>
+        <figcaption>Figura 6: Distância percentual do acumulado em 12 meses em relação ao pico histórico anterior. Zero indica novo recorde.</figcaption>
+      </figure>
+
+      <p>
+        A Figura 6 e a Tabela 2 resumem os três ciclos de queda superiores a 10% no acumulado em 12 meses. Eles têm perfis
+        bem diferentes. A retração do fim dos anos 1990 foi profunda (35,3%) e lenta para se desfazer: o nível de outubro de
+        1997 só foi retomado em julho de 2004, quase sete anos depois. A crise de 2008 foi a mais branda nessa métrica
+        (13,8%) e a mais rápida, com recuperação em 20 meses. Já a queda iniciada em setembro de 2013 é a maior e a mais
+        longa: atingiu 47,9% em outubro de 2020 e seguia aberta 110 meses depois, no fim da série.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Tabela 2: Ciclos de queda do acumulado em 12 meses (quedas superiores a 10%).</caption>
+          <thead>
+            <tr><th>Pico</th><th>Acum. 12m no pico</th><th>Vale</th><th>Queda</th><th>Meses até o vale</th><th>Recuperação do pico</th><th>Meses até recuperar</th></tr>
+          </thead>
+          <tbody id="tab-episodios"></tbody>
+        </table>
+      </div>
+
+      <p>
+        Um ponto importante é que a pandemia não aparece como ciclo separado: ela atingiu a indústria quando esta ainda
+        estava 22% abaixo do pico de 2013 e aprofundou uma retração já existente. Para comparar os dois choques abruptos da
+        série, medimos a queda da produção dessazonalizada frente à média dos três meses anteriores (Tabela 3).
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Tabela 3: Choques abruptos na produção dessazonalizada.</caption>
+          <thead>
+            <tr><th>Choque</th><th>Mês de fundo</th><th>Produção no fundo</th><th>Queda dessaz.</th><th>Variação em 12 meses</th><th>Retomada do nível</th><th>Meses abaixo</th></tr>
+          </thead>
+          <tbody id="tab-choques"></tbody>
+        </table>
+      </div>
+
+      <p>
+        Em dezembro de 2008 foram produzidas 91.314 unidades, 57,9% a menos que em dezembro de 2007, e o nível anterior ao
+        choque só foi retomado em outubro de 2009. O período coincide com a redução do IPI para automóveis, adotada a partir
+        de dezembro de 2008. Em abril de 2020, com as fábricas paradas, a produção foi de apenas 1.847 unidades (queda de
+        99,3% em 12 meses), o menor valor de toda a série. A retomada, porém, foi mais rápida: o nível dessazonalizado
+        anterior voltou em setembro de 2020. O choque da pandemia foi, portanto, mais profundo e mais curto. A fraqueza de
+        2021, visível na Figura 1, tem outra natureza: o setor relatou restrições de oferta, em especial a escassez de
+        semicondutores.
+      </p>
+
+      <figure>
+        <div id="fig-residuo" class="chart-container"></div>
+        <figcaption>Figura 7: Resíduo da produção dessazonalizada frente à tendência robusta, com outliers pela regra de Tukey (1,5 x IQR) destacados em vermelho.</figcaption>
+      </figure>
+
+      <p>
+        A regra de Tukey sinaliza 16 dos 359 meses como outliers (Figura 7), sendo 10 negativos e 6 positivos. Os negativos
+        se agrupam em torno dos choques conhecidos: novembro e dezembro de 1998, novembro e dezembro de 2008 e abril a julho
+        de 2020. Os meses não sinalizados ficam entre 20,8% abaixo e 19,8% acima da tendência. Parte dos outliers positivos
+        (dezembro de 2020, janeiro e dezembro de 2021) indica meses de virada de ano mais fortes que o padrão histórico, o
+        que é compatível com a recomposição de estoques após as paralisações. Esses pontos foram mantidos na base e apenas
+        marcados na coluna <code>outlier</code>, pois são eventos reais, e não erros de medição.
+      </p>
+    </section>
+
+    <!-- 4. Conclusão -->
+    <section id="conclusao">
+      <h2>4. Conclusão</h2>
+      <p>
+        O estudo responde às três perguntas propostas. Quanto à <strong>RQ1</strong>, a produção de veículos seguiu ciclos
+        longos: mais que triplicou entre 1993 e 2013, mas perdeu 41,4% entre 2013 e 2016 e terminou 2022 ainda 36,7% abaixo
+        do pico. Quanto à <strong>RQ2</strong>, existe sazonalidade significativa e relativamente estável, com vale entre
+        dezembro e fevereiro e picos em março e agosto, embora o vale de fim de ano tenha se atenuado. Quanto à
+        <strong>RQ3</strong>, os choques diferem em forma: 2008 foi abrupto e de recuperação rápida, 2020 foi o mais
+        profundo e o mais curto, e a retração de 2014 a 2016 foi a mais duradoura.
+      </p>
+      <p>
+        <strong>Limitações.</strong> A base é univariada e agregada: não distingue automóveis, comerciais leves, caminhões e
+        ônibus, nem montadoras ou estados. As associações com eventos econômicos são interpretações apoiadas na coincidência
+        temporal, e não inferência causal. A decomposição clássica supõe sazonalidade fixa dentro de cada janela e perde os
+        seis meses de cada extremidade da tendência. A série não foi ajustada por dias úteis, e 2022 está incompleto. Por
+        fim, o recorte termina em novembro de 2022.
+      </p>
+      <p>
+        <strong>Trabalhos futuros.</strong> (i) Atualizar a série pela API do SGS, já suportada pelo pipeline; (ii) cruzar a
+        produção com juros (Selic), crédito, câmbio e licenciamentos para investigar determinantes; (iii) aplicar
+        decomposição STL e ajuste por dias úteis; (iv) construir modelos de previsão (SARIMA, ETS) e avaliá-los fora da
+        amostra; e (v) desagregar por segmento com os anuários da ANFAVEA.
+      </p>
+    </section>
+
+    <!-- 5. FAIR Statement -->
+    <section id="fair">
+      <h2>5. Disponibilidade dos Dados e Declaração FAIR</h2>
+      <div class="fair-box">
+        <h3>Declaração de Aderência FAIR</h3>
+        <ul>
+          <li><strong>Findable (Localizável):</strong> repositório público com <code>README.md</code> contendo resumo executivo, palavras-chave, autoria, disciplina, semestre, instituição e links perenes para a fonte original (Kaggle e série SGS 1373 do Banco Central).</li>
+          <li><strong>Accessible (Acessível):</strong> código e dados acessíveis sem autenticação. O dado bruto está versionado em <code>data/raw/</code> e, se ausente, é baixado da API aberta do Banco Central. O artigo é servido pelo GitHub Pages em layout responsivo.</li>
+          <li><strong>Interoperable (Interoperável):</strong> dicionário de dados em <code>data/data_dictionary.md</code> com significado, tipo e formato de cada variável. Dados tratados em Parquet e CSV comprimido (gzip), com datas em ISO 8601.</li>
+          <li><strong>Reusable (Reutilizável):</strong> código sob licença MIT; texto, figuras e dados derivados sob CC-BY 4.0. O ambiente é recriado por <code>requirements.txt</code> com versões fixadas, e o pipeline é determinístico.</li>
+        </ul>
+      </div>
+
+      <p style="margin-top: 1.5rem;">Para reproduzir integralmente o pipeline, da leitura do dado bruto às figuras deste artigo:</p>
+
+      <pre><code># 1. Clonar o repositório
+git clone https://github.com/marcelobfb/producao-veiculos-brasil.git
+cd producao-veiculos-brasil
+
+# 2. Criar e ativar o ambiente virtual (Python 3.13)
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+# 3. Executar o ETL (bruto -> data/processed)
+python -m src.etl
+
+# 4. Gerar métricas, figuras e dados dos gráficos (-> docs/assets)
+python -m src.analise
+
+# 5. (Opcional) Reexecutar o notebook exploratório
+jupyter nbconvert --to notebook --execute --inplace notebooks/analise_exploratoria.ipynb
+
+# 6. Visualizar o artigo localmente
+python -m http.server --directory docs 8000   # abrir http://localhost:8000</code></pre>
+    </section>
+
+    <!-- 6. Referências -->
+    <section id="referencias" class="references">
+      <h2>6. Referências</h2>
+      <ol>
+        <li>ASSOCIAÇÃO NACIONAL DOS FABRICANTES DE VEÍCULOS AUTOMOTORES (ANFAVEA). <strong>Estatísticas</strong>. São Paulo: ANFAVEA. Disponível em: https://anfavea.com.br/site/edicoes-em-excel/. Acesso em: 15 nov. 2026.</li>
+        <li>BANCO CENTRAL DO BRASIL. <strong>SGS: Sistema Gerenciador de Séries Temporais</strong>. Série 1373: Produção de veículos, total. Brasília: BCB. Disponível em: https://api.bcb.gov.br/dados/serie/bcdata.sgs.1373/dados?formato=json. Acesso em: 15 nov. 2026.</li>
+        <li>BERNARDO, Leonardo Almeida. <strong>Valor da produção de automóveis no Brasil</strong>. Kaggle, 2022. Conjunto de dados. Disponível em: https://www.kaggle.com/datasets/leonardobern/valor-da-produo-de-automveis-no-brasil. Acesso em: 15 nov. 2026.</li>
+        <li>HYNDMAN, Rob J.; ATHANASOPOULOS, George. <strong>Forecasting: principles and practice</strong>. 3. ed. Melbourne: OTexts, 2021. Disponível em: https://otexts.com/fpp3/. Acesso em: 15 nov. 2026.</li>
+        <li>MCKINNEY, Wes. <strong>Python for data analysis</strong>: data wrangling with pandas, NumPy, and Jupyter. 3. ed. Sebastopol: O'Reilly Media, 2022.</li>
+        <li>PLOTLY TECHNOLOGIES INC. <strong>Plotly JavaScript open source graphing library</strong>. Montreal: Plotly. Disponível em: https://plotly.com/javascript/. Acesso em: 15 nov. 2026.</li>
+        <li>THE PANDAS DEVELOPMENT TEAM. <strong>pandas documentation</strong>. Disponível em: https://pandas.pydata.org/docs/. Acesso em: 15 nov. 2026.</li>
+        <li>TUKEY, John W. <strong>Exploratory data analysis</strong>. Reading: Addison-Wesley, 1977.</li>
+        <li>WILKINSON, Mark D. et al. The FAIR Guiding Principles for scientific data management and stewardship. <strong>Scientific Data</strong>, v. 3, n. 160018, 2016. DOI: 10.1038/sdata.2016.18.</li>
+      </ol>
+    </section>
+
+    <footer>
+      Projeto Prático G2, Linguagens de Programação, 2026.2. Texto e figuras sob licença CC-BY 4.0; código sob licença MIT.
+    </footer>
+  </div>
+
+  <!-- Gráficos interativos (Plotly) e tabelas, alimentados por assets/dados_graficos.js -->
+  <script>
+    const D = window.DADOS;
+    const M = D.metricas;
+    const AZUL = '#1d4ed8', AZUL_CLARO = '#60a5fa', VERMELHO = '#dc2626', CINZA = '#64748b';
+    const FONTE = '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif';
+    const config = { responsive: true, displayModeBar: false };
+    const ESTREITO = window.innerWidth < 600;
+    const notas = (lista) => ESTREITO ? [] : lista;
+    const base = (extra) => Object.assign({
+      font: { family: FONTE, size: 12, color: '#1f2937' },
+      separators: ',.',
+      margin: { t: ESTREITO ? 40 : 30, r: 16, l: ESTREITO ? 44 : 70, b: 40 },
+      autosize: true,
+      hovermode: 'x unified',
+      legend: { orientation: 'h', y: 1.02, yanchor: 'bottom', x: 0 },
+      plot_bgcolor: '#fff', paper_bgcolor: '#fff'
+    }, extra);
+    const eixoY = (titulo, extra) => Object.assign({ title: { text: ESTREITO ? '' : titulo, standoff: 8 }, automargin: true, gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1' }, extra);
+    const eixoData = { hoverformat: '%m/%Y', tickformat: '%Y', dtick: 'M48', gridcolor: '#f1f5f9' };
+    const inteiro = (v) => v.toLocaleString('pt-BR');
+    const pct = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+    const mesAno = (s) => s ? s.slice(5, 7) + '/' + s.slice(0, 4) : 'não recuperado';
+
+    // Figura 1: série mensal + média móvel
+    Plotly.newPlot('fig-serie', [
+      { x: D.datas, y: D.producao, type: 'scatter', mode: 'lines', name: 'Produção mensal',
+        line: { color: AZUL_CLARO, width: 1.2 }, hovertemplate: '%{y:,.0f} un.' },
+      { x: D.datas, y: D.media_movel_12m, type: 'scatter', mode: 'lines', name: 'Média móvel de 12 meses',
+        line: { color: AZUL, width: 2.5 }, hovertemplate: '%{y:,.0f} un.' }
+    ], base({
+      xaxis: eixoData,
+      yaxis: eixoY('Unidades produzidas', { tickformat: ESTREITO ? '.2s' : ',.0f', rangemode: 'tozero' }),
+      annotations: notas([
+        { x: '2008-12-01', y: 91314, text: 'Crise de 2008', ax: -45, ay: 30, arrowcolor: CINZA, font: { size: 11, color: CINZA } },
+        { x: '2020-04-01', y: 1847, text: 'Pandemia (abr/2020)', ax: -70, ay: -18, arrowcolor: CINZA, font: { size: 11, color: CINZA } },
+        { x: '2013-04-01', y: 352328, text: 'Máximo mensal (abr/2013)', ax: -75, ay: -12, arrowcolor: CINZA, font: { size: 11, color: CINZA } }
+      ])
+    }), config);
+
+    // Figura 2: totais anuais
+    Plotly.newPlot('fig-anual', [{
+      x: D.anual.ano, y: D.anual.total, type: 'bar',
+      marker: { color: D.anual.completo.map(c => c ? AZUL : '#93c5fd') },
+      customdata: D.anual.completo.map(c => c ? 'ano completo' : 'janeiro a novembro'),
+      hovertemplate: '%{x}: %{y:,.0f} un. (%{customdata})<extra></extra>'
+    }], base({
+      hovermode: 'closest', bargap: 0.25,
+      xaxis: { dtick: 3 },
+      yaxis: eixoY('Unidades produzidas', { tickformat: '.2s' })
+    }), config);
+
+    // Figura 3: índice sazonal (desvio em relação a 100)
+    Plotly.newPlot('fig-sazonal', [{
+      x: D.meses, y: D.indice_sazonal.map(v => v - 100), base: 100, type: 'bar',
+      marker: { color: D.indice_sazonal.map(v => v >= 100 ? AZUL : AZUL_CLARO) },
+      text: D.indice_sazonal.map(v => v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })),
+      textposition: 'outside', cliponaxis: false,
+      customdata: D.indice_sazonal,
+      hovertemplate: '%{x}: índice %{customdata:.1f}<extra></extra>'
+    }], base({
+      hovermode: 'closest', bargap: 0.3,
+      yaxis: eixoY('Índice sazonal', { range: [78, 116] }),
+      shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 100, y1: 100, line: { color: CINZA, width: 1 } }]
+    }), config);
+
+    // Figura 6: distância do pico
+    Plotly.newPlot('fig-queda', [{
+      x: D.datas, y: D.queda_do_pico_pct, type: 'scatter', mode: 'lines', fill: 'tozeroy',
+      name: 'Distância do pico', line: { color: AZUL, width: 1.8 }, fillcolor: 'rgba(96,165,250,0.3)',
+      hovertemplate: '%{y:.1f}%<extra></extra>'
+    }], base({
+      xaxis: eixoData,
+      yaxis: eixoY('% em relação ao pico anterior', { ticksuffix: '%' }),
+      annotations: notas([
+        { x: '1999-09-01', y: -35.3, text: 'set/1999: -35,3%', ax: 0, ay: 22, showarrow: true, arrowcolor: CINZA, font: { size: 11, color: CINZA } },
+        { x: '2009-09-01', y: -13.8, text: 'set/2009: -13,8%', ax: 0, ay: 22, showarrow: true, arrowcolor: CINZA, font: { size: 11, color: CINZA } },
+        { x: '2020-10-01', y: -47.9, text: 'out/2020: -47,9%', ax: -40, ay: 18, showarrow: true, arrowcolor: CINZA, font: { size: 11, color: CINZA } }
+      ])
+    }), config);
+
+    // Figura 7: resíduos e outliers
+    const fora = D.datas.map((d, i) => i).filter(i => D.outlier[i]);
+    Plotly.newPlot('fig-residuo', [
+      { x: D.datas, y: D.residuo_pct, type: 'scatter', mode: 'lines', name: 'Resíduo dessazonalizado',
+        line: { color: AZUL_CLARO, width: 1.2 }, hovertemplate: '%{y:.1f}%' },
+      { x: fora.map(i => D.datas[i]), y: fora.map(i => D.residuo_pct[i]), type: 'scatter', mode: 'markers',
+        name: 'Outlier (1,5 x IQR)', marker: { color: VERMELHO, size: 8, line: { color: '#fff', width: 1.5 } },
+        hovertemplate: '%{y:.1f}% (outlier)' }
+    ], base({
+      xaxis: eixoData,
+      yaxis: eixoY('% da tendência', { ticksuffix: '%' })
+    }), config);
+
+    // Tabela 1: índice sazonal por subperíodo
+    document.getElementById('tab-sazonal').innerHTML = Object.entries(M.sazonalidade.por_periodo).map(([periodo, valores]) =>
+      '<tr><td>' + periodo.replace('-', ' a ') + '</td>' + D.meses.map(m =>
+        '<td>' + valores[m].toLocaleString('pt-BR', { minimumFractionDigits: 1 }) + '</td>').join('') + '</tr>').join('');
+
+    // Tabela 2: ciclos de queda
+    document.getElementById('tab-episodios').innerHTML = M.episodios.map(e =>
+      '<tr><td>' + mesAno(e.pico) + '</td><td>' + inteiro(e.pico_valor) + '</td><td>' + mesAno(e.vale) + '</td><td>' +
+      pct(e.queda_pct) + '</td><td>' + e.meses_ate_vale + '</td><td>' + mesAno(e.recuperacao) + '</td><td>' +
+      (e.meses_ate_recuperar ?? 'em aberto') + '</td></tr>').join('');
+
+    // Tabela 3: choques abruptos
+    document.getElementById('tab-choques').innerHTML = M.choques.map(c =>
+      '<tr><td>' + c.choque + '</td><td>' + mesAno(c.fundo) + '</td><td>' + inteiro(c.producao_no_fundo) + '</td><td>' +
+      pct(c.queda_dessaz_pct) + '</td><td>' + pct(c.var_anual_no_fundo_pct) + '</td><td>' + mesAno(c.retomada) +
+      '</td><td>' + c.meses_abaixo_da_referencia + '</td></tr>').join('');
+  </script>
+</body>
+</html>
